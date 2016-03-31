@@ -1,6 +1,7 @@
 package Main;
 
 import java.util.Arrays;
+import java.util.Random;
 
 
 /**
@@ -15,12 +16,16 @@ public class Tower {
 
 	private int bombCount;
 	//' ' for air, '*' = brick, other = the letter required to
-	private char bricks[][];
+	private char requiredKey;
 
+	//level 0 = top level (-1 = tower finished)
 	private int currentLevel;
-	private int currentBrick;
-	//0 = normal render, 1, 2 = building (first, second stage); 3, 4 = exploding (first, second stage)
-	private int topLevelState;
+	private int newBrickIndex;
+
+	//0 = normal render; 1, 2 = building (first, second stage); 3, 4 = exploding (first, second stage)
+	private int currentLevelState;
+
+	Random random = new Random();
 
 	Tower(String name, int height, int width) {
 		this.name = name;
@@ -28,32 +33,75 @@ public class Tower {
 		this.width = width;
 
 		this.bombCount = 0;
-		this.topLevelState = 0;
-		this.currentLevel = 0;
-		this.currentBrick = 0;
+		this.currentLevelState = 0;
+		this.currentLevel = height - 1;
+		this.newBrickIndex= 0;
 
-
-		//initialise bricks size and all chars to ' '
-		bricks = new char[height][width];
-
-		for (int i = 0; i < height; i++) {
-			Arrays.fill(bricks[i], ' ');
-		}
+		//TODO required key?
 	}
 
-	char getCurrentNewBrick () {
-		return bricks[currentLevel][currentBrick];
+	public String getName() {
+		return this.name;
 	}
 
-	boolean isFinished() {
-		if (currentLevel >= height) {
+	public int getBombCount() {
+		return bombCount;
+	}
+
+	public int getHeight() {
+		return this.height;
+	}
+
+	public int getWidth() {
+		return this.width;
+	}
+
+	public int getCurrentLevel() {
+		return this.currentLevel;
+	}
+
+	public int getNewBrickIndex() {
+		return this.newBrickIndex;
+	}
+
+	public char getRequiredKey() {
+		return requiredKey;
+	}
+
+	public void setRequiredKey(char newKey) {
+		this.requiredKey = newKey;
+	}
+
+	public int getCurrentLevelState() {
+		return this.currentLevelState;
+	}
+
+	public void setCurrentLevelState(int newState) {
+		this.currentLevelState = newState;
+	}
+
+	public void successfullyBuild() {
+		//if we need to finish building this level, do
+	}
+
+	public void completeLevel(char newRequiredKey) {
+		this.requiredKey = requiredKey;
+		this.bombCount++;
+		this.currentLevel--;
+		this.newBrickIndex = 0;
+	}
+
+	public void completeBrick(char newRequiredKey) {
+		this.requiredKey = newRequiredKey;
+		this.newBrickIndex++;
+	}
+
+	public boolean isFinished() {
+		if (currentLevel < 0) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-
-	
-
 
 }
