@@ -19,7 +19,9 @@ public class AsciiRenderer extends AsciiPanel implements GameRenderer {
 	private final int TOWER_GAP;
 	private final String BRICK = "[_]";
 	private final String AIR_ABOVE_BRICK = " _ ";
+
 	private String allBricks;
+	private String allAir;
 
 	public AsciiRenderer(Tower leftTower, Tower rightTower, int towerWallOffset, int towerGap) {
 		super(towerWallOffset * 2 + (leftTower.getWidth() * 3) * 2 + towerGap,
@@ -33,8 +35,10 @@ public class AsciiRenderer extends AsciiPanel implements GameRenderer {
 		this.TOWER_GAP = towerGap;
 
 		this.allBricks = "";
+		this.allAir = "";
 		for (int j = 0; j < TOWER_WIDTH; j++) {
 			allBricks += BRICK;
+			allAir += "   ";
 		}
 
 		//super();
@@ -87,40 +91,30 @@ public class AsciiRenderer extends AsciiPanel implements GameRenderer {
 				}
 
 				break;
-			case 1:
+			case -1:
 				//TODO make these cases more exciting
 				//building stage one
-				currentLevel = "building #1...";
+				aboveLevel =
+				currentLevel = "exploding...";
+				break;
+			case -2:
+				//building stage two
+				currentLevel = "exploding.....";
+				break;
+			case 1:
+				//exploding stage one
+				currentLevel = "building...";
 				break;
 			case 2:
-				//building stage two
-				currentLevel = "building #2...";
-				break;
-			case 3:
-				//exploding stage one
-				currentLevel = "break #1...";
-				break;
-			case 4:
 				//exploding stage two
-				currentLevel = "break #2...";
+				currentLevel = "building.....";
 				break;
 		}
-
-		//TODO: remove these one by one
-		//aboveLevel = "";
-		if (isRightTower) {
-			System.out.print("printing right, =");
-		} else {
-			System.out.print("printing left, =");
-		}
-
-		System.out.println(currentLevel);
 
 		//write above current level, current level, and below
 		write(aboveLevel, currentLevelX, currentLevelY - 1);
 		write(currentLevel, currentLevelX, currentLevelY);
 		if (tower.getCurrentLevel() < tower.getHeight() - 1) {
-			System.out.println("printing all bricks"); //TODO debug del
 			write(allBricks, currentLevelX, currentLevelY + 1);
 		}
 	}

@@ -1,13 +1,15 @@
 package Main;
 
 import javax.swing.JFrame;
-import AsciiPanel.AsciiPanel;
-import oracle.jvm.hotspot.jfr.JFR;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+//import java.awt.event.KeyListener;
+
 
 /**
  *
  */
-public class Game extends JFrame {
+public class Game extends JFrame implements KeyListener {
 
 	private String playerNames[];
 	private int towerWidth;
@@ -19,15 +21,17 @@ public class Game extends JFrame {
 	private final char LEFT_REQUIRED_KEYS[] = {'A', 'S', 'D'};
 	private final char RIGHT_REQUIRED_KEYS[] = {'J', 'K', 'L'};
 
+	private final long RENDER_WAIT = (1000/60);
+
+	private TowerController leftTowerController;
+	private TowerController rightTowerController;
+
+
 	Game(String[] playerNames, int towerWidth, int towerHeight) {
 		super();
 		this.playerNames = playerNames;
 		this.towerWidth = towerWidth;
 		this.towerHeight = towerHeight;
-
-		//create tower arrays, chars all spaces
-		//
-		//set gameReady to true;
 	}
 
 	/**
@@ -43,10 +47,19 @@ public class Game extends JFrame {
 		Tower leftTower = new Tower(playerNames[0], towerHeight, towerWidth);
 		Tower rightTower = new Tower(playerNames[1], towerHeight, towerWidth);
 
-		//2 Create left and right TowerLogics and begin running them, these are constructed with
+		//2 Create left and right TowerControllers and begin running them, these are constructed with
 		//	their respective Towers
-		TowerLogic leftTowerLogic = new TowerLogic(leftTower);
-		TowerLogic rightTowerLogic = new TowerLogic(rightTower);
+		leftTowerController = new TowerController(leftTower, LEFT_REQUIRED_KEYS);
+		rightTowerController = new TowerController(rightTower, RIGHT_REQUIRED_KEYS);
+
+		Thread leftTowerThread = new Thread(leftTowerController);
+		Thread rightTowerThread = new Thread(rightTowerController);
+
+		leftTowerThread.start();
+		rightTowerThread.start();
+
+		//leftTowerController.run();
+		//rightTowerController.run();
 
 
 		//3 Create a GameRenderer and give it the left and right towers
@@ -55,44 +68,65 @@ public class Game extends JFrame {
 
 		add(renderer);
 		pack();
+		addKeyListener(this);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
 
-		//loop to test tower rendering
-		for (int i = 0; i < 13; i++) {
+		System.out.println(isFocusable());
+
+		//4 Run the game renderer periodically (individual of the underlying game logic). The towers are
+		//	rendered 60 times per second
+		while (true) {
 			try {
-				Thread.sleep(1200);
+				Thread.sleep(RENDER_WAIT);
 			} catch (InterruptedException e) {
-				System.err.println("...");	//TODO: fix
+				e.printStackTrace();
+				System.exit(1);
 			}
 
-			if (i == 8) {
-				leftTower.completeLevel('L');
-			} else if (i == 9){
-				rightTower.completeLevel('R');
-			} else if (i % 2 == 0) {
-				leftTower.completeBrick('L');
-			} else if (i % 2 == 1) {
-				rightTower.completeBrick('R');
-			}
+			//TODO: something different when the game is finished (rather than just close)
 
 			renderer.render();
 			repaint();
 		}
-
-		//4 Enable key events, check for game finished then send them through to the correct TowerLogic
-		// 	when they happen
-
-		//5 Run the game renderer periodically (individual of the underlying game logic). The towers are
-		//	rendered 60 times per second
-
-
-
 	}
 
-	private boolean gameFinished(Tower leftTower, Tower rightTower) {
-		return (leftTower.getCurrentLevel() < 0 || rightTower.getCurrentLevel() < 0);
+	private boolean gameFinished() {
+		return (leftTowerController.towerFinished() || rightTowerController.towerFinished());
 	}
 
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (gameFinished()) {
+			return;
+		}
+
+		char cLower = Character.toLowerCase(e.getKeyChar());
+		char cUpper = Character.toUpperCase(e.getKeyChar());
+
+		for (char requiredKey: LEFT_REQUIRED_KEYS) {
+			if (cLower == requiredKey || cUpper == requiredKey) {
+				leftTowerController.handleKeyPress(cUpper);
+				return;
+			}
+		}
+
+		for (char requiredKey: RIGHT_REQUIRED_KEYS) {
+			if (cLower == requiredKey || cUpper == requiredKey) {
+				rightTowerController.handleKeyPress(cUpper);
+				return;
+			}
+		}
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		//do nothing
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		//do nothing
+	}
 
 }

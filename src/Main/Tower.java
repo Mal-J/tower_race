@@ -22,7 +22,7 @@ public class Tower {
 	private int currentLevel;
 	private int newBrickIndex;
 
-	//0 = normal render; 1, 2 = building (first, second stage); 3, 4 = exploding (first, second stage)
+	//0 = normal render; 1, 2 = building (first, second stage); -1, -2 = exploding (first, second stage)
 	private int currentLevelState;
 
 	Random random = new Random();
@@ -48,6 +48,14 @@ public class Tower {
 		return bombCount;
 	}
 
+	public void addBomb() {
+		this.bombCount++;
+	}
+
+	public void removeBomb() {
+		this.bombCount--;
+	}
+
 	public int getHeight() {
 		return this.height;
 	}
@@ -62,6 +70,10 @@ public class Tower {
 
 	public int getNewBrickIndex() {
 		return this.newBrickIndex;
+	}
+
+	public void resetNewBrickIndex() {
+		this.newBrickIndex = 0;
 	}
 
 	public char getRequiredKey() {
@@ -84,15 +96,30 @@ public class Tower {
 		//if we need to finish building this level, do
 	}
 
+	public void explodeLevel(char newRequiredKey) {
+		resetNewBrickIndex();
+		setRequiredKey(newRequiredKey);
+	}
+
 	public void completeLevel(char newRequiredKey) {
-		this.requiredKey = requiredKey;
-		this.bombCount++;
+		setRequiredKey(newRequiredKey);
+		addBomb();
+
 		this.currentLevel--;
 		this.newBrickIndex = 0;
 	}
 
+	public void breakBrick(char newRequiredKey) {
+		if (newBrickIndex > 0) {
+			this.newBrickIndex--;
+		}
+
+		this.setRequiredKey(newRequiredKey);
+	}
+
 	public void completeBrick(char newRequiredKey) {
-		this.requiredKey = newRequiredKey;
+		setRequiredKey(newRequiredKey);
+
 		this.newBrickIndex++;
 	}
 
