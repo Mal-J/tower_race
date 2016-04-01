@@ -26,7 +26,6 @@ public class Game extends JFrame implements KeyListener {
 	private TowerController leftTowerController;
 	private TowerController rightTowerController;
 
-
 	Game(String[] playerNames, int towerWidth, int towerHeight) {
 		super();
 		this.playerNames = playerNames;
@@ -58,10 +57,6 @@ public class Game extends JFrame implements KeyListener {
 		leftTowerThread.start();
 		rightTowerThread.start();
 
-		//leftTowerController.run();
-		//rightTowerController.run();
-
-
 		//3 Create a GameRenderer and give it the left and right towers
 		AsciiRenderer renderer = new AsciiRenderer(leftTower, rightTower, TOWER_WALL_OFFSET, TOWER_GAP);
 		renderer.render();
@@ -71,8 +66,6 @@ public class Game extends JFrame implements KeyListener {
 		addKeyListener(this);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
-
-		System.out.println(isFocusable());
 
 		//4 Run the game renderer periodically (individual of the underlying game logic). The towers are
 		//	rendered 60 times per second
@@ -106,14 +99,22 @@ public class Game extends JFrame implements KeyListener {
 
 		for (char requiredKey: LEFT_REQUIRED_KEYS) {
 			if (cLower == requiredKey || cUpper == requiredKey) {
-				leftTowerController.handleKeyPress(cUpper);
+				if (leftTowerController.isAcceptingKeyPresses()) {
+					leftTowerController.setLatestKeyPress(cUpper);
+					(new Thread(leftTowerController)).start();
+				}
+
 				return;
 			}
 		}
 
 		for (char requiredKey: RIGHT_REQUIRED_KEYS) {
 			if (cLower == requiredKey || cUpper == requiredKey) {
-				rightTowerController.handleKeyPress(cUpper);
+				if (rightTowerController.isAcceptingKeyPresses()) {
+					rightTowerController.setLatestKeyPress(cUpper);
+					(new Thread(rightTowerController)).start();
+				}
+
 				return;
 			}
 		}

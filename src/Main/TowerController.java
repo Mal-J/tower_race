@@ -16,6 +16,7 @@ public class TowerController implements Runnable {
 
 	private long lastEnemyBombTime;
 	private boolean acceptingKeyPresses = true;
+	private char latestKeyPress;
 	Random random = new Random();
 
 	TowerController(Tower tower, char requiredKeys[]) {
@@ -29,29 +30,29 @@ public class TowerController implements Runnable {
 
 	@Override
 	public void run() {
-		try {
-			wait();
-		} catch (InterruptedException e) {
-			System.err.println(tower.getName() + "'s TowerController interruped somehow");
-			e.printStackTrace();
-			System.exit(1);
-		}
+//		try {
+//			wait();
+//		} catch (InterruptedException e) {
+//			System.err.println(tower.getName() + "'s TowerController interruped somehow");
+//			e.printStackTrace();
+//			System.exit(1);
+//		}
+
+		handleKeyPress();
 	}
 
 	//TODO: handle key presses while the tower is already doing something
-	public void handleKeyPress(char key) {
+	public void handleKeyPress() {
 		//if the tower is currently doing something,
-		if (tower.getCurrentLevelState() != 0 || !acceptingKeyPresses) {
+		if (tower.getCurrentLevelState() != 0) {
 			return;
 		}
-
-		acceptingKeyPresses = false;
 
 		if ((System.currentTimeMillis() - lastEnemyBombTime) < BOMB_LIFESPAN) {
 			//if an active bomb is planted in this tower, explode the top level
 			explodeTopLevel();
 
-		} else if (key == tower.getRequiredKey()){
+		} else if (latestKeyPress == tower.getRequiredKey()){
 			if (tower.getNewBrickIndex() >= tower.getWidth() - 1) {
 				//a new level needs to be created
 				createNewLevel();
@@ -66,6 +67,11 @@ public class TowerController implements Runnable {
 		}
 
 		acceptingKeyPresses = true;
+	}
+
+	public void setLatestKeyPress(char newKeyPress) {
+		acceptingKeyPresses = false;
+		this.latestKeyPress = newKeyPress;
 	}
 
 	public boolean useBomb() {
@@ -83,6 +89,10 @@ public class TowerController implements Runnable {
 
 	public boolean towerFinished() {
 		return tower.isFinished();
+	}
+
+	public boolean isAcceptingKeyPresses() {
+		return acceptingKeyPresses;
 	}
 
 
