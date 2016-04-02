@@ -6,8 +6,7 @@ public class Main {
         //Take names input
 
         //Initiate game with names, default settings instance (tower width, height)
-        String names[] = {"Mal", "Cody"};
-        Game game = new Game(names, 5, 10);
+        Game game = new Game(5, 8);
 		game.begin();
     }
 }

@@ -3,6 +3,9 @@
 out
 .DS_Store
 
+# Git swap files
+*.swp
+
 .idea/workspace.xml
 .idea/tasks.xml
 

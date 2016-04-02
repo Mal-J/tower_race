@@ -1,7 +1,5 @@
 package Main;
 
-import com.sun.org.apache.regexp.internal.RE;
-
 import java.util.Random;
 
 /**
@@ -11,10 +9,7 @@ public class TowerController implements Runnable {
 
 	private final Tower tower;
 	private final char REQUIRED_KEYS[];
-	//how long a planted bomb lasts in milliseconds
-	private final int BOMB_LIFESPAN = 1000;
 
-	private long lastEnemyBombTime;
 	private boolean acceptingKeyPresses = true;
 	private char latestKeyPress;
 	Random random = new Random();
@@ -22,60 +17,61 @@ public class TowerController implements Runnable {
 	TowerController(Tower tower, char requiredKeys[]) {
 		this.tower = tower;
 		this.REQUIRED_KEYS = requiredKeys;
-		this.lastEnemyBombTime = 0;
 
-		tower.setRequiredKey(getRandomKey());
 		//set tower's current brick to next random letter
+		tower.setRequiredKey(getRandomKey());
 	}
 
 	@Override
 	public void run() {
-//		try {
-//			wait();
-//		} catch (InterruptedException e) {
-//			System.err.println(tower.getName() + "'s TowerController interruped somehow");
-//			e.printStackTrace();
-//			System.exit(1);
-//		}
-
 		handleKeyPress();
 	}
 
 	//TODO: handle key presses while the tower is already doing something
 	public void handleKeyPress() {
-		//if the tower is currently doing something,
-		if (tower.getCurrentLevelState() != 0) {
-			return;
-		}
-
-		if ((System.currentTimeMillis() - lastEnemyBombTime) < BOMB_LIFESPAN) {
+		if (tower.enemyBombSet()) {
 			//if an active bomb is planted in this tower, explode the top level
+			tower.removeEnemyBomb();
 			explodeTopLevel();
-
 		} else if (latestKeyPress == tower.getRequiredKey()){
-			if (tower.getNewBrickIndex() >= tower.getWidth() - 1) {
-				//a new level needs to be created
-				createNewLevel();
+			//if the key is the one required to build the brick
+			if (tower.getNewBrickIndex() >= tower.getWIDTH() - 1) {
+				//a level has been completed
+				if (!tower.isOnLastLevel() && !towerFinished()) {
+					//if the tower is not finished yet, we need to finish its level and go up to the next
+					createNewLevel();
+				} else {
+					tower.setState(100);
+				}
 			} else {
 				//just add a new brick
 				tower.completeBrick(getRandomKey());
 			}
 
 		} else {
-			//wrong key, break a brick?
+			//wrong key, break a brick
 			breakBrick();
 		}
 
 		acceptingKeyPresses = true;
 	}
 
-	public void setLatestKeyPress(char newKeyPress) {
-		acceptingKeyPresses = false;
-		this.latestKeyPress = newKeyPress;
+	public synchronized boolean setNewKeyPress(char newKeyPress) {
+		if (acceptingKeyPresses && !towerFinished()) {
+			acceptingKeyPresses = false;
+			this.latestKeyPress = newKeyPress;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
+	/**
+	 * Attempt to provide a bomb to be used on the other tower
+	 * @return	true if the attempt was successful
+	 */
 	public boolean useBomb() {
-		if (tower.getBombCount() > 0) {
+		if (tower.getUsableBombCount() > 0) {
 			tower.removeBomb();
 			return true;
 		} else {
@@ -83,74 +79,82 @@ public class TowerController implements Runnable {
 		}
 	}
 
-	public void plantEnemyBomb() {
-		lastEnemyBombTime = System.currentTimeMillis();
+	/**
+	 * Receive an enemy bomb (ie. have one planted in our tower so any key presses will explode the top level)
+	 */
+	public void receiveEnemyBomb() {
+		tower.addEnemyBomb();
+	}
+
+	public void dismantleBomb() {
+		if (tower.enemyBombSet()) {
+			tower.dismantleEnemyBomb();
+		}
 	}
 
 	public boolean towerFinished() {
 		return tower.isFinished();
 	}
 
-	public boolean isAcceptingKeyPresses() {
-		return acceptingKeyPresses;
-	}
-
-
 	private char getRandomKey() {
 		return REQUIRED_KEYS[random.nextInt(REQUIRED_KEYS.length)];
 	}
 
 	private void explodeTopLevel() {
-		tower.setCurrentLevelState(-1);
+		tower.setState(-1);
 
 		try {
-			Thread.sleep(1200);
+			Thread.sleep(900);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 
-		tower.setCurrentLevelState(-2);
+		tower.setState(-2);
 
 		try {
-			Thread.sleep(1200);
+			Thread.sleep(900);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 
 		tower.explodeLevel(getRandomKey());
-		tower.setCurrentLevelState(0);
+		tower.setState(0);
 	}
 
 	private void createNewLevel() {
-		tower.setCurrentLevelState(1);
+		if (towerFinished()) {
+			return;
+		}
+
+		tower.setState(1);
 
 		try {
-			Thread.sleep(1200);
+			Thread.sleep(900);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 
-		tower.setCurrentLevelState(2);
+		tower.setState(2);
 
 		try {
-			Thread.sleep(1200);
+			Thread.sleep(900);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 
 		tower.completeLevel(getRandomKey());
-		tower.setCurrentLevelState(0);
+		tower.setState(0);
 	}
 
 	private void breakBrick() {
 		tower.setRequiredKey('X');
 
 		try {
-			Thread.sleep(1200);
+			Thread.sleep(900);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);

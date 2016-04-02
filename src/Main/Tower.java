@@ -1,8 +1,5 @@
 package Main;
 
-import java.util.Arrays;
-import java.util.Random;
-
 
 /**
  *
@@ -10,58 +7,73 @@ import java.util.Random;
 public class Tower {
 
 	//Tower specs
-	private final String name;
-	private final int height;
-	private final int width;
+	private final String NAME;
+	private final int HEIGHT;
+	private final int WIDTH;
 
-	private int bombCount;
-	//' ' for air, '*' = brick, other = the letter required to
+	private int enemyBombCount;
+	private int usableBombCount;
+	//the key required to build the current brick
 	private char requiredKey;
 
-	//level 0 = top level (-1 = tower finished)
+	//level 0 = top level
 	private int currentLevel;
 	private int newBrickIndex;
 
 	//0 = normal render; 1, 2 = building (first, second stage); -1, -2 = exploding (first, second stage)
-	private int currentLevelState;
-
-	Random random = new Random();
+	//100 = finished
+	private int state;
 
 	Tower(String name, int height, int width) {
-		this.name = name;
-		this.height = height;
-		this.width = width;
+		this.NAME = name;
+		this.HEIGHT = height;
+		this.WIDTH = width;
 
-		this.bombCount = 0;
-		this.currentLevelState = 0;
+		this.usableBombCount = 0;
+		this.state = 0;
 		this.currentLevel = height - 1;
 		this.newBrickIndex= 0;
-
-		//TODO required key?
 	}
 
-	public String getName() {
-		return this.name;
+	public String getNAME() {
+		return this.NAME;
 	}
 
-	public int getBombCount() {
-		return bombCount;
+	public int getUsableBombCount() {
+		return usableBombCount;
 	}
 
-	public void addBomb() {
-		this.bombCount++;
+	public void addUsableBomb() {
+		this.usableBombCount++;
+	}
+
+	public boolean enemyBombSet() {
+		return this.enemyBombCount > 0;
+	}
+
+	public void addEnemyBomb() {
+		this.enemyBombCount++;
+	}
+
+	public void removeEnemyBomb() {
+		this.enemyBombCount--;
+	}
+
+	public void dismantleEnemyBomb() {
+		this.enemyBombCount--;
+		this.usableBombCount++;
 	}
 
 	public void removeBomb() {
-		this.bombCount--;
+		this.usableBombCount--;
 	}
 
 	public int getHeight() {
-		return this.height;
+		return this.HEIGHT;
 	}
 
-	public int getWidth() {
-		return this.width;
+	public int getWIDTH() {
+		return this.WIDTH;
 	}
 
 	public int getCurrentLevel() {
@@ -84,16 +96,16 @@ public class Tower {
 		this.requiredKey = newKey;
 	}
 
-	public int getCurrentLevelState() {
-		return this.currentLevelState;
+	public int getState() {
+		return this.state;
 	}
 
-	public void setCurrentLevelState(int newState) {
-		this.currentLevelState = newState;
+	public void setState(int newState) {
+		this.state = newState;
 	}
 
-	public void successfullyBuild() {
-		//if we need to finish building this level, do
+	public boolean isOnLastLevel() {
+		return (this.currentLevel <= 0);
 	}
 
 	public void explodeLevel(char newRequiredKey) {
@@ -103,7 +115,7 @@ public class Tower {
 
 	public void completeLevel(char newRequiredKey) {
 		setRequiredKey(newRequiredKey);
-		addBomb();
+		addUsableBomb();
 
 		this.currentLevel--;
 		this.newBrickIndex = 0;
@@ -124,11 +136,7 @@ public class Tower {
 	}
 
 	public boolean isFinished() {
-		if (currentLevel < 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return (state == 100);
 	}
 
 }
