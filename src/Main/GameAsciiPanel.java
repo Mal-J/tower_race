@@ -3,7 +3,7 @@ package Main;
 import AsciiPanel.AsciiPanel;
 
 /**
- *
+ * A panel that contains the ASCII graphics of two tower objects and their relevant information.
  */
 public class GameAsciiPanel extends AsciiPanel {
 
@@ -25,10 +25,10 @@ public class GameAsciiPanel extends AsciiPanel {
 	private String allAirAboveCondos;
 
 	public GameAsciiPanel(Tower leftTower, Tower rightTower) {
-		//had to put nums in the place of constants here, can't think of a better solution
-		//first 2 = TOWER_WALL_OFFSET, first 5 = TOWER_GAP, 4 = TOWER_TOP_OFFSET
-		super(2 * 2 + (leftTower.getWIDTH() * 3) * 2 + 5,		//panel width
-				4 + leftTower.getHeight());						//panel height
+		// had to put nums in the place of constants here, can't think of a better solution
+		// first 2 = TOWER_WALL_OFFSET, first 5 = TOWER_GAP, 4 = TOWER_TOP_OFFSET
+		super(2 * 2 + (leftTower.getWIDTH() * 3) * 2 + 5,		// panel width
+				4 + leftTower.getHeight());						// panel height
 
 		this.leftTower = leftTower;
 		this.rightTower = rightTower;
@@ -45,11 +45,18 @@ public class GameAsciiPanel extends AsciiPanel {
 			allAirAboveCondos += AIR_ABOVE_CONDO;
 		}
 
-		//write the player names to the top of the screen
+		// write the player names to the top of the screen
 		this.write(leftTower.getNAME(), 1, 0);
 		this.write(rightTower.getNAME(), SCREEN_WIDTH - rightTower.getNAME().length() - 1, 0);
+
+		// write the two towers to the panel
+		this.render();
 	}
 
+	/**
+	 * Update the information displayed in the panel so that the Tower's current state is represented
+	 * correctly
+	 */
 	public void render() {
 		String leftBombCount = Integer.toString(leftTower.getUsableBombCount());
 		String rightBombCount = Integer.toString(rightTower.getUsableBombCount());
@@ -57,16 +64,22 @@ public class GameAsciiPanel extends AsciiPanel {
 		this.write(leftBombCount, 1, 1);
 		this.write(rightBombCount, SCREEN_WIDTH - rightBombCount.length() - 1, 1);
 
-		//write the current tower state for both towers
+		// write the current tower state for both towers
 		writeTowerState(leftTower, false);
 		writeTowerState(rightTower, true);
 	}
 
+	/**
+	 * Write a tower's state to the appropriate place in the panel
+	 * @param tower			the tower to write to the panel
+	 * @param isRightTower	indicates whether or not the tower should be written to the right-hand-side of the
+	 *                      screen
+	 */
 	private void writeTowerState(Tower tower, boolean isRightTower) {
 		String aboveLevel = "";
 		String currentLevel = "";
 
-		//the offset from the left hand side of the screen depends whether the tower is the left or right
+		// the offset from the left hand side of the screen depends whether the tower is the left or right
 		int currentLevelX;
 		if (!isRightTower) {
 			currentLevelX = TOWER_WALL_OFFSET;
@@ -77,10 +90,10 @@ public class GameAsciiPanel extends AsciiPanel {
 
 		switch (tower.getState()) {
 			case 0:
-				//render normally
+				// render normally
 				int newCondoIndex = tower.getNewCondoIndex();
 
-				//write normal condos
+				// write normal condos
 				for (int j = 0; j < newCondoIndex; j++) {
 					aboveLevel += AIR_ABOVE_CONDO;
 					currentLevel += CONDO;
@@ -96,40 +109,40 @@ public class GameAsciiPanel extends AsciiPanel {
 
 				break;
 			case -1:
-				//TODO make these cases more exciting
-				//building stage one
+				// TODO make these cases more exciting
+				// building stage one
 				aboveLevel = allAir;
 				currentLevel = "exploding...";
 				break;
 			case -2:
-				//building stage two
+				// building stage two
 				aboveLevel = allAir;
 				currentLevel = "exploding.....";
 				break;
 			case 1:
-				//exploding stage one
+				// exploding stage one
 				aboveLevel = allAir;
 				currentLevel = "building...";
 				break;
 			case 2:
-				//exploding stage two
+				// exploding stage two
 				aboveLevel = allAir;
 				currentLevel = "building.....";
 				break;
 			case 100:
-				//the tower is finished
-				//TODO: fireworks
+				// the tower is finished
+				// TODO: fireworks
 				currentLevel = allCondos;
 				aboveLevel = allAirAboveCondos;
 				break;
 		}
 
-		//fill the remainder of the current level with air so that old chars are overwritten
+		// fill the remainder of the current level with air so that old chars are overwritten
 		for (int i = currentLevel.length(); i < TOWER_WIDTH * 3; i++) {
 			currentLevel += " ";
 		}
 
-		//write above current level, current level, and below
+		// write above current level, current level, and below
 		write(aboveLevel, currentLevelX, currentLevelY - 1);
 		write(currentLevel, currentLevelX, currentLevelY);
 		if (tower.getCurrentLevel() < TOWER_HEIGHT - 1) {

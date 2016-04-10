@@ -5,7 +5,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 /**
- *
+ * Represents the game's visible window. Responsible for:
+ * 	1. Creating and handling the panel that displays game state
+ *  2. Listening for key presses and sending them to the appropriate tower if required
  */
 public class GameWindow extends JFrame implements KeyListener {
 
@@ -14,7 +16,7 @@ public class GameWindow extends JFrame implements KeyListener {
 	private TowerController leftTowerController;
 	private TowerController rightTowerController;
 
-	private final long RENDER_WAIT = (1000/60);		//how long to wait between renders of the panel
+	private final long RENDER_WAIT = (1000/60);		// how long to wait between renders of the panel
 
 	GameWindow(TowerController leftTowerController, TowerController rightTowerController) {
 		this.leftTowerController = leftTowerController;
@@ -49,15 +51,15 @@ public class GameWindow extends JFrame implements KeyListener {
 			return;
 		}
 
-		//handle bomb plant attempts
+		// handle bomb plant attempts
 		if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 			if (e.getKeyLocation() == KeyEvent.KEY_LOCATION_LEFT && leftTowerController.useBomb()) {
-				//the bomb plant came from the left, start a new BombTracker thread with the right tower as
-				//the victim
+				// the bomb plant came from the left, start a new BombTracker thread with the right tower as
+				// the victim
 				new Thread(new BombTracker(rightTowerController)).start();
 			} else if (e.getKeyLocation() == KeyEvent.KEY_LOCATION_RIGHT && rightTowerController.useBomb()) {
-				//the bomb plant came from the right, start a new BombTracker thread with the left tower as
-				//the victim
+				// the bomb plant came from the right, start a new BombTracker thread with the left tower as
+				// the victim
 				new Thread(new BombTracker(leftTowerController)).start();
 			}
 
@@ -79,12 +81,12 @@ public class GameWindow extends JFrame implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		//do nothing
+		// do nothing
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		//do nothing
+		// do nothing
 	}
 
 	private boolean gameFinished() {

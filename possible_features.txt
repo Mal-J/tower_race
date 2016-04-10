@@ -1,9 +1,12 @@
 Possible future featres to implement:
-  . Name entry and instructions screen (a single screen for both possibly)
+  . Name entry and instructions screen 
+    - A single screen for both
+  . A game start screen 
+    - Both players need to press their bomb key to begin the game
   . Animations/colour
     - Game finish animations on winning tower
-    - Building/Exploding
-    - Different tower colours (pick carefully)
+    - Building/Exploding animation
+    - Different tower colours
     - Unbuilt condo lighter shade of tower colour
   . Possbily hide the fact that a player has used a bomb by not decrementing the number immediately
   . Larger screen

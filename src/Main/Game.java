@@ -11,7 +11,7 @@ public class Game {
 	private int towerWidth;
 	private int towerHeight;
 
-	//the possible condo building keys for the left and right towers, must be upper case
+	// the possible condo building keys for the left and right towers, must be upper case
 	private final char LEFT_REQUIRED_KEYS[] = {'A', 'S', 'D'};
 	private final char RIGHT_REQUIRED_KEYS[] = {'J', 'K', 'L'};
 
@@ -28,8 +28,8 @@ public class Game {
 		Tower leftTower = new Tower(retrievePlayerName(1), towerHeight, towerWidth);
 		Tower rightTower = new Tower(retrievePlayerName(2), towerHeight, towerWidth);
 
-		//Create left and right TowerControllers and begin running them, these are constructed with
-		//their respective Towers
+		// Create left and right TowerControllers and begin running them, these are constructed with
+		// their respective Towers
 		leftTowerController = new TowerController(leftTower, LEFT_REQUIRED_KEYS);
 		rightTowerController = new TowerController(rightTower, RIGHT_REQUIRED_KEYS);
 
@@ -42,6 +42,11 @@ public class Game {
 		new GameWindow(leftTowerController, rightTowerController).beginRendering();
 	}
 
+	/**
+	 * Retrieve a player's name from the command line.
+	 * @param playerNumber	the player number whose name is being asked for (1 or 2)
+	 * @return				the player's name
+	 */
 	private String retrievePlayerName(int playerNumber) {
 		Scanner scanner = new Scanner(System.in);
 		String nameAttempt;

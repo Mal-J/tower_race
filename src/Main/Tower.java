@@ -1,25 +1,25 @@
 package Main;
 
 /**
- *
+ * Represents an NxM tower. Stores tower's stats, build progress, state, and enemy/usable bomb counts.
  */
 public class Tower {
 
-	//Tower specs
+	// Tower specs
 	private final String NAME;
 	private final int HEIGHT;
 	private final int WIDTH;
 
 	private int enemyBombCount;
 	private int usableBombCount;
-	private char requiredKey;			//the character/key required to build the current condo
+	private char requiredKey;			// the character/key required to build the current condo
 
-	//level 0 = top level
+	// level 0 = top level
 	private int currentLevel;
 	private int newCondoIndex;
 
-	//0 = normal render; 1, 2 = building (first, second stage); -1, -2 = exploding (first, second stage)
-	//100 = finished
+	// 0 = normal render; 1, 2 = building (first, second stage); -1, -2 = exploding (first, second stage)
+	// 100 = finished
 	private int state;
 
 	Tower(String name, int height, int width) {
@@ -111,6 +111,10 @@ public class Tower {
 		setRequiredKey(newRequiredKey);
 	}
 
+	/**
+	 * Complete the tower's current level and make the following level available to build
+	 * @param newRequiredKey	The key required to build the next condo
+	 */
 	public void completeLevel(char newRequiredKey) {
 		setRequiredKey(newRequiredKey);
 		addUsableBomb();
@@ -119,6 +123,10 @@ public class Tower {
 		this.newCondoIndex = 0;
 	}
 
+	/**
+	 * Break the condo currently being built and move back to building the previous condo
+	 * @param newRequiredKey	The key required to build the next condo
+	 */
 	public void breakCondo(char newRequiredKey) {
 		if (newCondoIndex > 0) {
 			this.newCondoIndex--;

@@ -18,7 +18,7 @@ public class TowerController implements Runnable {
 		this.tower = tower;
 		this.REQUIRED_KEYS = requiredKeys;
 
-		//set tower's current condo to next random letter
+		// set tower's current condo to next random letter
 		tower.setRequiredKey(getRandomKey());
 	}
 
@@ -27,29 +27,29 @@ public class TowerController implements Runnable {
 		handleKeyPress();
 	}
 
-	//TODO: handle key presses while the tower is already doing something
+	// TODO: handle key presses while the tower is already doing something
 	public void handleKeyPress() {
 		if (tower.enemyBombSet()) {
-			//if an active bomb is planted in this tower, explode the top level
+			// if an active bomb is planted in this tower, explode the top level
 			tower.removeEnemyBomb();
 			explodeTopLevel();
 		} else if (latestKeyPress == tower.getRequiredKey()){
-			//if the key is the one required to build the condo
+			// if the key is the one required to build the condo
 			if (tower.getNewCondoIndex() >= tower.getWIDTH() - 1) {
-				//a level has been completed
+				// a level has been completed
 				if (!tower.isOnLastLevel() && !towerFinished()) {
-					//if the tower is not finished yet, we need to finish its level and go up to the next
+					// if the tower is not finished yet, we need to finish its level and go up to the next
 					createNewLevel();
 				} else {
 					tower.setState(100);
 				}
 			} else {
-				//just add a new condo
+				// just add a new condo
 				tower.completeCondo(getRandomKey());
 			}
 
 		} else {
-			//wrong key, break a condo
+			// wrong key, break a condo
 			breakCondo();
 		}
 
