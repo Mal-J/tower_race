@@ -18,7 +18,7 @@ public class TowerController implements Runnable {
 		this.tower = tower;
 		this.REQUIRED_KEYS = requiredKeys;
 
-		//set tower's current brick to next random letter
+		//set tower's current condo to next random letter
 		tower.setRequiredKey(getRandomKey());
 	}
 
@@ -34,8 +34,8 @@ public class TowerController implements Runnable {
 			tower.removeEnemyBomb();
 			explodeTopLevel();
 		} else if (latestKeyPress == tower.getRequiredKey()){
-			//if the key is the one required to build the brick
-			if (tower.getNewBrickIndex() >= tower.getWIDTH() - 1) {
+			//if the key is the one required to build the condo
+			if (tower.getNewCondoIndex() >= tower.getWIDTH() - 1) {
 				//a level has been completed
 				if (!tower.isOnLastLevel() && !towerFinished()) {
 					//if the tower is not finished yet, we need to finish its level and go up to the next
@@ -44,16 +44,30 @@ public class TowerController implements Runnable {
 					tower.setState(100);
 				}
 			} else {
-				//just add a new brick
-				tower.completeBrick(getRandomKey());
+				//just add a new condo
+				tower.completeCondo(getRandomKey());
 			}
 
 		} else {
-			//wrong key, break a brick
-			breakBrick();
+			//wrong key, break a condo
+			breakCondo();
 		}
 
 		acceptingKeyPresses = true;
+	}
+
+	public Tower getTower() {
+		return this.tower;
+	}
+
+	public boolean isRequiredKey(char key) {
+		for (char c: REQUIRED_KEYS) {
+			if (c == key) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public synchronized boolean setNewKeyPress(char newKeyPress) {
@@ -150,7 +164,7 @@ public class TowerController implements Runnable {
 		tower.setState(0);
 	}
 
-	private void breakBrick() {
+	private void breakCondo() {
 		tower.setRequiredKey('X');
 
 		try {
@@ -160,7 +174,7 @@ public class TowerController implements Runnable {
 			System.exit(1);
 		}
 
-		tower.breakBrick(getRandomKey());
+		tower.breakCondo(getRandomKey());
 	}
 
 }

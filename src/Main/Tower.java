@@ -1,6 +1,5 @@
 package Main;
 
-
 /**
  *
  */
@@ -13,12 +12,11 @@ public class Tower {
 
 	private int enemyBombCount;
 	private int usableBombCount;
-	//the key required to build the current brick
-	private char requiredKey;
+	private char requiredKey;			//the character/key required to build the current condo
 
 	//level 0 = top level
 	private int currentLevel;
-	private int newBrickIndex;
+	private int newCondoIndex;
 
 	//0 = normal render; 1, 2 = building (first, second stage); -1, -2 = exploding (first, second stage)
 	//100 = finished
@@ -32,7 +30,7 @@ public class Tower {
 		this.usableBombCount = 0;
 		this.state = 0;
 		this.currentLevel = height - 1;
-		this.newBrickIndex= 0;
+		this.newCondoIndex= 0;
 	}
 
 	public String getNAME() {
@@ -80,12 +78,12 @@ public class Tower {
 		return this.currentLevel;
 	}
 
-	public int getNewBrickIndex() {
-		return this.newBrickIndex;
+	public int getNewCondoIndex() {
+		return this.newCondoIndex;
 	}
 
-	public void resetNewBrickIndex() {
-		this.newBrickIndex = 0;
+	public void resetNewCondoIndex() {
+		this.newCondoIndex = 0;
 	}
 
 	public char getRequiredKey() {
@@ -109,7 +107,7 @@ public class Tower {
 	}
 
 	public void explodeLevel(char newRequiredKey) {
-		resetNewBrickIndex();
+		resetNewCondoIndex();
 		setRequiredKey(newRequiredKey);
 	}
 
@@ -118,21 +116,21 @@ public class Tower {
 		addUsableBomb();
 
 		this.currentLevel--;
-		this.newBrickIndex = 0;
+		this.newCondoIndex = 0;
 	}
 
-	public void breakBrick(char newRequiredKey) {
-		if (newBrickIndex > 0) {
-			this.newBrickIndex--;
+	public void breakCondo(char newRequiredKey) {
+		if (newCondoIndex > 0) {
+			this.newCondoIndex--;
 		}
 
 		this.setRequiredKey(newRequiredKey);
 	}
 
-	public void completeBrick(char newRequiredKey) {
+	public void completeCondo(char newRequiredKey) {
 		setRequiredKey(newRequiredKey);
 
-		this.newBrickIndex++;
+		this.newCondoIndex++;
 	}
 
 	public boolean isFinished() {
